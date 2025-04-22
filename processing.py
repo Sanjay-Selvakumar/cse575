@@ -9,8 +9,8 @@ os.makedirs("MRI", exist_ok=True)
 os.makedirs("PET", exist_ok=True)
 
 # Drop specified columns
-mri_drop_cols = ['PHASE', 'PTID', 'PROCESSDATE', 'SLICE_THICKNESS', 'T2_QC_COMMENT', 'update_stamp']
-pet_drop_cols = ['ORIGPROT', 'COLPROT', 'RUNDATE', 'STATUS', 'MODALITY', 'update_stamp']
+mri_drop_cols = ['PHASE', 'PTID', 'PROCESSDATE', 'IMAGEUID_T1', 'IMAGEUID_T2', 'SLICE_THICKNESS', 'T2_QC_COMMENT', 'update_stamp']
+pet_drop_cols = ['ORIGPROT', 'COLPROT', 'RUNDATE', 'STATUS', 'MODALITY', 'LONIUID', 'update_stamp']
 
 mri_df = mri_df.drop(columns=[col for col in mri_drop_cols if col in mri_df.columns])
 pet_df = pet_df.drop(columns=[col for col in pet_drop_cols if col in pet_df.columns])
@@ -163,13 +163,13 @@ def generate_features(modality, scan_df):
     non_progressors_df = non_progressors_df.sort_values(by=["RID", "EXAMDATE"])
 
     progressors_df = progressors_df[
-        ((progressors_df["Stage"] == "From") & (progressors_df["SCAN_OFFSET_YEARS"] <= 0.5)) |
-        ((progressors_df["Stage"] == "To") & (progressors_df["SCAN_OFFSET_YEARS"] >= -0.5))
+        ((progressors_df["Stage"] == "From") & (progressors_df["SCAN_OFFSET_YEARS"] <= 1)) |
+        ((progressors_df["Stage"] == "To") & (progressors_df["SCAN_OFFSET_YEARS"] >= -1))
     ]
 
     non_progressors_df = non_progressors_df[
-        ((non_progressors_df["Stage"] == "From") & (non_progressors_df["SCAN_OFFSET_YEARS"] <= 0.5)) |
-        ((non_progressors_df["Stage"] == "To") & (non_progressors_df["SCAN_OFFSET_YEARS"] >= -0.5))
+        ((non_progressors_df["Stage"] == "From") & (non_progressors_df["SCAN_OFFSET_YEARS"] <= 1)) |
+        ((non_progressors_df["Stage"] == "To") & (non_progressors_df["SCAN_OFFSET_YEARS"] >= -1))
     ]
 
     progressors_df = progressors_df.groupby("RID").filter(lambda x: x["EXAMDATE"].nunique() == 2)
